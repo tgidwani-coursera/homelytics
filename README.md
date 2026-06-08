@@ -173,6 +173,32 @@ they sell plots, captured as allottee units.)
 - **Fault isolation:** a failure in one sub-step (e.g. allottees) is logged and
   the rest of the project still gets saved.
 
+## Dashboard
+
+A read-only web dashboard (FastAPI + a single-file vanilla HTML/CSS/JS SPA) for
+exploring the scraped data — built for home-buyer "trust and transparency".
+
+```bash
+pip install -r requirements.txt   # adds fastapi + uvicorn
+./run.sh                          # -> http://127.0.0.1:8000  (reads .env)
+```
+
+Pages (hash-routed): home (stats + search/filters + project cards), project
+detail (inventory sold% bar, apartment types, a must-have/good-to-have document
+checklist, amenities), and builder profiles (project list, past/ongoing counts,
+complaints). API under `/api/*`:
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /api/stats` | totals + filter options |
+| `GET /api/projects?district=&type=&status=&search=` | filtered project list |
+| `GET /api/projects/{registration_no}` | full detail (all tables joined) |
+| `GET /api/builders/{promoter_name}` | builder profile |
+| `GET /api/complaints?respondent=` | complaints for a builder |
+
+Code: [`dashboard/app.py`](dashboard/app.py) (API) and
+[`dashboard/static/index.html`](dashboard/static/index.html) (SPA).
+
 ## Database schema
 
 See [`db/schema.sql`](db/schema.sql). Tables: `projects`, `project_details`,
