@@ -116,3 +116,18 @@ CREATE TABLE IF NOT EXISTS complaints (
 );
 
 CREATE INDEX IF NOT EXISTS idx_complaints_respondent ON complaints (respondent);
+
+-- Append-only inventory snapshots for trend series (e.g. flats booked over time).
+-- One row per project per scrape date; the rest of the schema upserts in place,
+-- so this is the only table that retains history across scrapes.
+CREATE TABLE IF NOT EXISTS inventory_snapshots (
+    registration_no TEXT REFERENCES projects (registration_no) ON DELETE CASCADE,
+    snapshot_date   DATE NOT NULL DEFAULT CURRENT_DATE,
+    total_units     INTEGER,
+    units_booked    INTEGER,
+    units_unsold    INTEGER,
+    units_mortgage  INTEGER,
+    units_other     INTEGER,
+    captured_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (registration_no, snapshot_date)
+);

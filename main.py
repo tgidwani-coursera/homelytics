@@ -28,6 +28,7 @@ from scrapers.api import api_client
 from scrapers.complaints import scrape_complaints
 from scrapers.project_detail import scrape_detail
 from scrapers.project_list import scrape_list
+from scrapers.snapshots import record_snapshot
 from scrapers.utils import configure_logging
 from scrapers.view_project import enrich_from_view
 
@@ -126,6 +127,8 @@ def run(args: argparse.Namespace) -> int:
                     view_id = args.view_id or client.get_view_id(stub.get("encrypted_id"))
                     if view_id:
                         enrich_from_view(client, stub["registration_no"], view_id)
+                        # Append a dated inventory snapshot for trend series.
+                        record_snapshot(stub["registration_no"])
 
         if do_complaints:
             logger.info("Scraping complaints register")

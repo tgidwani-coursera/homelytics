@@ -278,6 +278,17 @@ def complaints(respondent: Optional[str] = None) -> list[dict[str, Any]]:
     """)
 
 
+@app.get("/api/trend")
+def trend(registration_no: str) -> list[dict[str, Any]]:
+    """Inventory snapshot series for a project (oldest -> newest)."""
+    return fetch_all("""
+        SELECT snapshot_date, total_units, units_booked, units_unsold, units_mortgage
+        FROM inventory_snapshots
+        WHERE registration_no = %s
+        ORDER BY snapshot_date
+    """, (registration_no,))
+
+
 # --------------------------------------------------------------------------- #
 # Static frontend (mounted last so /api/* takes precedence)
 # --------------------------------------------------------------------------- #
