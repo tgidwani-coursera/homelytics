@@ -10,11 +10,17 @@ from __future__ import annotations
 import logging
 from typing import Any, Iterator, Optional
 
-from db.connection import upsert
+from db.connection import get_cursor, upsert
 from .api import ReraApiClient
 from .utils import clean, to_date
 
 logger = logging.getLogger("homelytics.project_list")
+
+
+def _existing_registration_nos() -> set[str]:
+    with get_cursor(commit=False) as cur:
+        cur.execute("SELECT registration_no FROM projects")
+        return {r[0] for r in cur.fetchall()}
 
 
 def _date(item: dict[str, Any], *keys: str):
@@ -30,15 +36,24 @@ def scrape_list(
     district: Optional[str] = None,
     limit: Optional[int] = None,
     registration_no: Optional[str] = None,
+    refresh_existing: bool = False,
 ) -> Iterator[dict[str, Any]]:
     """Upsert projects (optionally filtered by district) and yield detail stubs.
 
     When ``registration_no`` is given, the district filter is ignored and only
     that project is fetched (server-side filter).
+
+    When ``refresh_existing`` is True, only projects already in the local DB are
+    processed — the bi-weekly refresh scope, so trend history accrues for exactly
+    the projects being tracked.
     """
     projects = client.get_projects(application_status="3", registration_no=registration_no)
 
-    if district and not registration_no:
+    if refresh_existing:
+        existing = _existing_registration_nos()
+        projects = [p for p in projects if clean(p.get("REGISTRATIONNO")) in existing]
+        logger.info("Refreshing %d projects already in the DB", len(projects))
+    elif district and not registration_no:
         projects = [
             p for p in projects
             if (p.get("DistrictName") or "").strip().lower() == district.strip().lower()

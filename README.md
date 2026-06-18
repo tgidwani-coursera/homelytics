@@ -106,6 +106,9 @@ python main.py --registration "RAJ/P/2024/3341"
 
 # Skip the granular enrichment (faster; project/promoter/docs basics only)
 python main.py --district Jaipur --skip-enrich
+
+# Re-scrape only the projects already in the DB (bi-weekly refresh scope)
+python main.py --refresh-existing --no-complaints
 ```
 
 ### CLI flags
@@ -115,6 +118,7 @@ python main.py --district Jaipur --skip-enrich
 | `--district` | `Jaipur` | Filter by district; `all` for every district |
 | `--limit` | _none_ | Cap projects/complaints processed (handy for testing) |
 | `--registration` | _none_ | Scrape only this registration number; ignores `--district` |
+| `--refresh-existing` | off | Re-scrape only projects already in the DB (bi-weekly refresh scope) |
 | `--view-id` | _none_ | Override the auto-resolved legacy view_id (rarely needed) |
 | `--init-db` | off | Apply schema and exit |
 | `--skip-details` | off | Scrape the project list only, not detail calls |
@@ -172,6 +176,31 @@ they sell plots, captured as allottee units.)
   are `INSERT ... ON CONFLICT DO UPDATE`, so re-runs refresh rather than duplicate.
 - **Fault isolation:** a failure in one sub-step (e.g. allottees) is logged and
   the rest of the project still gets saved.
+
+## Bi-weekly refresh & trends
+
+The scraper upserts in place, so most tables only hold the latest state. The one
+exception is **`inventory_snapshots`** — an append-only table that records each
+project's unit counts (total / booked / unsold / mortgage) per scrape date. That
+is what powers the "flats booked over time" trend on the dashboard.
+
+A scheduled refresh keeps it growing. On macOS, a launchd agent runs the scrape
+on the **1st & 15th of each month at 02:00**, scoped to the projects already in
+the DB (`--refresh-existing`), recording one snapshot per project per run:
+
+```bash
+# install (once)
+cp scripts/com.homelytics.biweekly.plist ~/Library/LaunchAgents/
+launchctl load -w ~/Library/LaunchAgents/com.homelytics.biweekly.plist
+# run once now / uninstall
+launchctl start  com.homelytics.biweekly
+launchctl unload -w ~/Library/LaunchAgents/com.homelytics.biweekly.plist
+```
+
+The job runs [`scripts/biweekly_scrape.sh`](scripts/biweekly_scrape.sh) and logs
+to `biweekly.log`. Grow the tracked set anytime by scraping more projects (e.g.
+`--district Jaipur`); the next refresh will include them. Bi-weekly suits how
+infrequently the RERA portal is updated.
 
 ## Dashboard
 

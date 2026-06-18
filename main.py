@@ -64,6 +64,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Apply db/schema.sql and exit without scraping.",
     )
     parser.add_argument(
+        "--refresh-existing", action="store_true",
+        help="Re-scrape only the projects already in the DB (the bi-weekly "
+             "refresh scope). Ignores --district. Records a trend snapshot per project.",
+    )
+    parser.add_argument(
         "--skip-details", action="store_true",
         help="Only scrape the project list, not each project's detail page.",
     )
@@ -89,7 +94,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def run(args: argparse.Namespace) -> int:
-    district = None if args.district.lower() == "all" else args.district
+    # --refresh-existing scopes by the local DB, so the district filter is moot.
+    district = None if (args.district.lower() == "all" or args.refresh_existing) else args.district
 
     init_pool()
     apply_schema()  # idempotent — ensures tables exist before we write
@@ -116,6 +122,7 @@ def run(args: argparse.Namespace) -> int:
             for stub in scrape_list(
                 client, district=district, limit=args.limit,
                 registration_no=args.registration,
+                refresh_existing=args.refresh_existing,
             ):
                 projects_done += 1
                 if not args.skip_details:
