@@ -121,6 +121,8 @@ def stats() -> dict[str, Any]:
             (SELECT count(*) FROM complaints)                     AS total_complaints
     """)
     # Distinct filter values for the homepage dropdowns.
+    states = [r["state"] for r in fetch_all(
+        "SELECT DISTINCT state FROM projects WHERE state IS NOT NULL ORDER BY 1")]
     districts = [r["district"] for r in fetch_all(
         "SELECT DISTINCT district FROM projects WHERE district IS NOT NULL ORDER BY 1")]
     types = [r["project_type"] for r in fetch_all(
@@ -131,7 +133,7 @@ def stats() -> dict[str, Any]:
         "SELECT DISTINCT EXTRACT(YEAR FROM expected_completion_date)::int AS y "
         "FROM project_details WHERE expected_completion_date IS NOT NULL ORDER BY y")]
     row["filters"] = {
-        "districts": districts, "types": types,
+        "states": states, "districts": districts, "types": types,
         "statuses": statuses, "completion_years": completion_years,
     }
     return row

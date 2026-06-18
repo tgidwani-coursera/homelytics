@@ -3,127 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homelytics — RERA Project Transparency</title>
+<title>Homelytics — Know before you buy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f7f9;
+    --bg: #f8f4f0;          /* warm cream */
     --surface: #ffffff;
-    --ink: #1f2933;
-    --ink-soft: #52606d;
-    --ink-faint: #9aa5b1;
-    --line: #e4e7eb;
-    --accent: #2b6777;       /* calm teal — trust */
-    --accent-soft: #e3eef1;
-    --good: #2f855a;
-    --good-soft: #e6f4ec;
-    --warn: #b7791f;
-    --warn-soft: #fbf3e2;
-    --bad: #c0392b;
-    --bad-soft: #fbe9e7;
-    --radius: 12px;
-    --shadow: 0 1px 3px rgba(31,41,51,.06), 0 1px 2px rgba(31,41,51,.04);
+    --ink: #1e3a2b;         /* deep forest green */
+    --ink-soft: #4a5d52;
+    --ink-faint: #8a988f;
+    --line: #e7e2da;
+    --green: #1e3a2b;
+    --green-soft: #e8efe4;
+    --lav: #cfdcff;         /* soft lavender */
+    --lav-soft: #eef3ff;
+    --lime: #eff87a;        /* CTA pop */
+    --lime-deep: #e2ee5b;
+    --good: #2f7a4f; --good-soft: #e3f0e8;
+    --warn: #9a6a12; --warn-soft: #f6edda;
+    --bad: #b3382c;  --bad-soft: #f7e6e3;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(30,58,43,.05), 0 6px 20px rgba(30,58,43,.05);
+    --shadow-lift: 0 10px 30px rgba(30,58,43,.10);
     --maxw: 1080px;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent); text-decoration: none; }
+  a { color: var(--green); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
 
-  header.site {
-    background: var(--surface); border-bottom: 1px solid var(--line);
-    position: sticky; top: 0; z-index: 10;
-  }
-  header.site .wrap { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
-  .logo { display: flex; align-items: baseline; gap: 8px; cursor: pointer; }
-  .logo b { font-size: 20px; letter-spacing: -.3px; }
-  .logo .dot { color: var(--accent); }
-  .logo span { color: var(--ink-faint); font-size: 12px; }
+  /* header */
+  header.site { position: sticky; top: 0; z-index: 20; background: rgba(248,244,240,.85);
+    backdrop-filter: saturate(150%) blur(8px); border-bottom: 1px solid var(--line); }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; }
+  .logo { display: flex; align-items: baseline; gap: 9px; cursor: pointer; }
+  .logo b { font-size: 20px; font-weight: 800; letter-spacing: -.4px; }
+  .logo .dot { color: var(--good); }
+  .logo span { color: var(--ink-faint); font-size: 12px; font-weight: 500; }
+  .nav-cta { font-size: 14px; font-weight: 700; padding: 8px 16px; border-radius: 999px;
+    background: var(--green); color: #fff; }
+  .nav-cta:hover { text-decoration: none; opacity: .92; }
 
-  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.4px; }
-  h2 { font-size: 16px; margin: 28px 0 12px; color: var(--ink); }
+  h1 { font-size: 28px; font-weight: 800; margin: 0 0 6px; letter-spacing: -.6px; }
+  h2 { font-size: 17px; font-weight: 700; margin: 30px 0 12px; }
   .muted { color: var(--ink-soft); }
   .faint { color: var(--ink-faint); }
 
-  /* stats banner */
-  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin: 22px 0; }
-  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-          padding: 18px; box-shadow: var(--shadow); }
-  .stat .n { font-size: 28px; font-weight: 700; letter-spacing: -.5px; }
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700;
+    cursor: pointer; border: none; padding: 13px 24px; border-radius: 999px;
+    background: var(--lime); color: var(--ink); box-shadow: var(--shadow);
+    transition: transform .12s, box-shadow .12s, background .12s; }
+  .btn:hover { background: var(--lime-deep); transform: translateY(-1px); box-shadow: var(--shadow-lift); text-decoration: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--ink); box-shadow: none; }
+  .btn-ghost:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+  /* ---------- Landing ---------- */
+  .hero { padding: 64px 0 36px; }
+  .eyebrow { display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .03em;
+    color: var(--green); background: var(--lav); padding: 6px 14px; border-radius: 999px; margin-bottom: 20px; }
+  .hero h1 { font-size: 52px; line-height: 1.04; letter-spacing: -1.4px; max-width: 14ch; }
+  .hero .lead { font-size: 18px; color: var(--ink-soft); max-width: 56ch; margin: 16px 0 0; }
+  .picker { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin: 30px 0 0;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; box-shadow: var(--shadow); max-width: 760px; }
+  .picker .field { display: flex; flex-direction: column; gap: 5px; flex: 1 1 150px; }
+  .picker .field label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
+  .picker select { font: inherit; font-weight: 600; padding: 11px 12px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--bg); color: var(--ink); }
+  .picker select:focus { outline: 2px solid var(--lav); border-color: var(--green); }
+  .picker .go { display: flex; align-items: flex-end; }
+  .picker .go .btn { height: 44px; }
+
+  .props { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 46px 0 10px; }
+  .prop { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .prop .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    background: var(--green-soft); margin-bottom: 12px; font-size: 18px; }
+  .prop h3 { margin: 0 0 4px; font-size: 15.5px; font-weight: 700; }
+  .prop p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+  .ministats { display: flex; flex-wrap: wrap; gap: 26px; margin: 30px 0 0; padding: 22px 0 0; border-top: 1px solid var(--line); }
+  .ministat b { font-size: 24px; font-weight: 800; }
+  .ministat span { color: var(--ink-soft); font-size: 13px; }
+
+  /* ---------- Explorer ---------- */
+  .page-head { margin: 28px 0 4px; }
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin: 18px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+  .stat .n { font-size: 28px; font-weight: 800; letter-spacing: -.5px; }
   .stat .l { color: var(--ink-soft); font-size: 13px; margin-top: 2px; }
 
-  /* controls */
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 20px; }
-  .controls input, .controls select {
-    font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
-    background: var(--surface); color: var(--ink);
-  }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 20px; }
+  .controls input, .controls select { font: inherit; font-weight: 500; padding: 11px 13px;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); }
   .controls input { flex: 1 1 240px; min-width: 180px; }
-  .controls input:focus, .controls select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .controls select { font-weight: 600; }
+  .controls input:focus, .controls select:focus { outline: 2px solid var(--lav); border-color: var(--green); }
 
-  /* project cards */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-          padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px;
-          transition: border-color .15s, transform .15s; }
+    padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; transition: border-color .15s, transform .15s, box-shadow .15s; }
   .card.click { cursor: pointer; }
-  .card.click:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .card .title { font-weight: 600; font-size: 15px; line-height: 1.35; }
-  .card .reg { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .card.click:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+  .card .title { font-weight: 700; font-size: 15.5px; line-height: 1.35; }
+  .card .reg { font-size: 12px; color: var(--ink-faint); }
   .badges { display: flex; flex-wrap: wrap; gap: 6px; }
-  .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft);
-           color: var(--accent); font-weight: 600; }
-  .badge.gray { background: #eef1f4; color: var(--ink-soft); }
+  .badge { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--green-soft); color: var(--green); font-weight: 700; }
+  .badge.lav { background: var(--lav-soft); color: #3a4a86; }
+  .badge.gray { background: #eef1ed; color: var(--ink-soft); }
   .badge.good { background: var(--good-soft); color: var(--good); }
   .badge.warn { background: var(--warn-soft); color: var(--warn); }
   .badge.bad  { background: var(--bad-soft); color: var(--bad); }
   .kv { font-size: 13px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 10px; }
-  .kv b { color: var(--ink); font-weight: 600; }
+  .kv b { color: var(--ink); font-weight: 700; }
 
   /* detail */
-  .back { display: inline-block; margin: 18px 0 6px; font-size: 14px; }
-  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-           padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
-  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px 24px; }
-  .fact .l { font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
-  .fact .v { font-size: 15px; margin-top: 2px; }
+  .back { display: inline-block; margin: 22px 0 8px; font-size: 14px; font-weight: 600; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px 26px; }
+  .fact .l { font-size: 11.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .fact .v { font-size: 15px; margin-top: 3px; }
 
-  /* sold bar */
-  .bar { height: 24px; border-radius: 8px; background: #eef1f4; overflow: hidden; display: flex; }
+  .bar { height: 26px; border-radius: 9px; background: #eef1ed; overflow: hidden; display: flex; }
   .bar .seg { height: 100%; }
-  .bar .sold { background: var(--good); }
-  .bar .mort { background: var(--warn); }
-  .bar .other { background: #cbd2d9; }
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+  .bar .sold { background: var(--good); } .bar .mort { background: var(--warn); } .bar .other { background: #c9d2cb; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 11px; font-size: 13px; color: var(--ink-soft); }
   .legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
 
-  /* checklist */
-  .checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
   .checklist li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-  .mark { width: 20px; height: 20px; border-radius: 50%; flex: none; display: grid; place-items: center;
-          font-size: 12px; font-weight: 700; color: #fff; }
-  .mark.yes { background: var(--good); }
-  .mark.no  { background: #cbd2d9; }
+  .mark { width: 21px; height: 21px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; }
+  .mark.yes { background: var(--good); } .mark.no { background: #c9d2cb; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .chip { font-size: 13px; padding: 7px 13px; border-radius: 999px; background: var(--green-soft); color: var(--green); font-weight: 600; }
   .chip.charged::after { content: " • charged"; color: var(--warn); font-size: 11px; }
 
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
-  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); }
+  th, td { text-align: left; padding: 10px 11px; border-bottom: 1px solid var(--line); }
+  th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 700; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
-  .empty { text-align: center; color: var(--ink-faint); padding: 40px 0; }
-  .doclink { font-size: 13px; }
-  footer { color: var(--ink-faint); font-size: 12px; text-align: center; padding: 30px 0; }
-  .spinner { text-align:center; padding:50px 0; color: var(--ink-faint); }
+  .empty { text-align: center; color: var(--ink-faint); padding: 44px 0; }
+  .doclink { font-size: 13px; font-weight: 600; }
+  footer { color: var(--ink-faint); font-size: 12.5px; text-align: center; padding: 40px 0; }
+  .spinner { text-align: center; padding: 56px 0; color: var(--ink-faint); }
 
-  @media (max-width: 720px) {
+  @media (max-width: 760px) {
+    .hero { padding: 40px 0 24px; }
+    .hero h1 { font-size: 38px; }
+    .props { grid-template-columns: 1fr; }
     .stats { grid-template-columns: repeat(2,1fr); }
-    h1 { font-size: 20px; }
   }
 </style>
 </head>
@@ -134,6 +169,7 @@
         <b>Homelytics<span class="dot">.</span></b>
         <span>RERA transparency for home buyers</span>
       </div>
+      <a class="nav-cta" href="#/explore">Explore projects</a>
     </div>
   </header>
   <main class="wrap" id="app"><div class="spinner">Loading…</div></main>
@@ -143,9 +179,9 @@
 const app = document.getElementById("app");
 const esc = (s) => (s == null ? "" : String(s).replace(/[&<>"']/g, c =>
   ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])));
+const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 const fmtDate = (s) => s ? new Date(s).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) : "—";
 const num = (n) => (n == null ? "—" : Number(n).toLocaleString("en-IN"));
-
 async function api(path) {
   const r = await fetch(path);
   if (!r.ok) throw new Error("HTTP " + r.status);
@@ -153,25 +189,78 @@ async function api(path) {
 }
 const statusClass = (s) => {
   const t = (s || "").toLowerCase();
-  if (t.includes("progress") || t.includes("approv")) return "good";
+  if (t.includes("approv") || t.includes("progress")) return "good";
   if (t.includes("reject") || t.includes("lapsed") || t.includes("expire")) return "bad";
+  if (t.includes("object")) return "warn";
   return "gray";
 };
 
-/* ---------------- Home ---------------- */
+/* ---------------- Landing ---------------- */
 let HOME_FILTERS = { district:"", type:"", status:"", completion_year:"", search:"" };
 
-async function renderHome() {
+async function renderLanding() {
   app.innerHTML = `<div class="spinner">Loading…</div>`;
   const stats = await api("/api/stats");
   const f = stats.filters;
-  // First option shows the filter name as a placeholder; selecting it clears the filter.
+  const stateOpts = (f.states || []).map(s => `<option value="${esc(s)}">${esc(cap(s))}</option>`).join("");
+  const distOpts = `<option value="">All districts</option>` +
+    (f.districts || []).map(d => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+
+  app.innerHTML = `
+    <section class="hero">
+      <span class="eyebrow">Rajasthan RERA · Home-buyer transparency</span>
+      <h1>Know before you buy.</h1>
+      <p class="lead">Homelytics turns Rajasthan RERA's official filings into clear, trustworthy insights on real-estate projects. Check inventory, builders, documents and complaints — all in one place, before you commit.</p>
+
+      <div class="picker">
+        <div class="field">
+          <label for="lstate">State</label>
+          <select id="lstate">${stateOpts}</select>
+        </div>
+        <div class="field">
+          <label for="lcity">City / District</label>
+          <select id="lcity">${distOpts}</select>
+        </div>
+        <div class="field go">
+          <button class="btn" id="lgo">Explore projects →</button>
+        </div>
+      </div>
+
+      <div class="props">
+        <div class="prop"><div class="ic">🛡️</div><h3>Verified RERA data</h3><p>Straight from Rajasthan's official registry — not listings or hearsay.</p></div>
+        <div class="prop"><div class="ic">📊</div><h3>Inventory & sales</h3><p>See units booked vs. available, with a trend that updates over time.</p></div>
+        <div class="prop"><div class="ic">🏗️</div><h3>Builder track record</h3><p>Past & ongoing projects, plus complaints on record for each promoter.</p></div>
+      </div>
+
+      <div class="ministats">
+        <div class="ministat"><b>${num(stats.total_projects)}</b> <span>projects tracked</span></div>
+        <div class="ministat"><b>${num(stats.total_builders)}</b> <span>builders</span></div>
+        <div class="ministat"><b>${num(stats.districts_covered)}</b> <span>districts</span></div>
+        <div class="ministat"><b>${num(stats.total_complaints)}</b> <span>complaints on record</span></div>
+      </div>
+    </section>
+  `;
+
+  document.getElementById("lgo").addEventListener("click", () => {
+    const district = document.getElementById("lcity").value;
+    HOME_FILTERS = { district, type:"", status:"", completion_year:"", search:"" };
+    location.hash = "#/explore";
+  });
+}
+
+/* ---------------- Explorer ---------------- */
+async function renderExplore() {
+  app.innerHTML = `<div class="spinner">Loading…</div>`;
+  const stats = await api("/api/stats");
+  const f = stats.filters;
   const opt = (arr, sel, label) => `<option value="">${esc(label)}</option>` +
     arr.map(v => `<option value="${esc(v)}" ${String(v)===String(sel)?"selected":""}>${esc(v)}</option>`).join("");
 
   app.innerHTML = `
-    <h1>Find a RERA-registered project</h1>
-    <p class="muted">Explore registered real-estate projects, their builders, inventory and compliance documents — transparently.</p>
+    <div class="page-head">
+      <h1>Explore projects</h1>
+      <p class="muted">Search and filter Rajasthan RERA-registered projects.</p>
+    </div>
     <div class="stats">
       <div class="stat"><div class="n">${num(stats.total_projects)}</div><div class="l">Projects</div></div>
       <div class="stat"><div class="n">${num(stats.total_builders)}</div><div class="l">Builders</div></div>
@@ -193,8 +282,7 @@ async function renderHome() {
         fs = document.getElementById("fs"), fy = document.getElementById("fy");
   let timer;
   const apply = () => {
-    HOME_FILTERS = { search:q.value.trim(), district:fd.value, type:ft.value,
-                     status:fs.value, completion_year:fy.value };
+    HOME_FILTERS = { search:q.value.trim(), district:fd.value, type:ft.value, status:fs.value, completion_year:fy.value };
     loadProjects();
   };
   q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(apply, 250); });
@@ -217,14 +305,13 @@ async function loadProjects() {
 }
 
 function cardHTML(p) {
-  const href = "#/project/" + p.registration_no;  // slashes kept; router handles
-  return `<div class="card click" onclick="location.hash='${esc(href)}'">
+  return `<div class="card click" onclick="location.hash='#/project/${esc(p.registration_no)}'">
     <div>
       <div class="title">${esc(p.project_name) || "Untitled project"}</div>
       <div class="reg">${esc(p.registration_no)}</div>
     </div>
     <div class="badges">
-      ${p.district ? `<span class="badge">${esc(p.district)}</span>` : ""}
+      ${p.district ? `<span class="badge lav">${esc(p.district)}</span>` : ""}
       ${p.project_type ? `<span class="badge gray">${esc(p.project_type)}</span>` : ""}
       ${p.status ? `<span class="badge ${statusClass(p.status)}">${esc(p.status)}</span>` : ""}
     </div>
@@ -234,9 +321,8 @@ function cardHTML(p) {
   </div>`;
 }
 
-/* ---------------- Trend chart (inline SVG, no deps) ---------------- */
+/* ---------------- Trend chart ---------------- */
 function trendChartSVG(series) {
-  // series: [{snapshot_date, total_units, units_booked, ...}] oldest->newest
   const W = 640, H = 200, pad = { l: 40, r: 16, t: 14, b: 28 };
   const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
   const maxY = Math.max(1, ...series.map(d => d.total_units || 0));
@@ -244,55 +330,47 @@ function trendChartSVG(series) {
   const x = (i) => pad.l + (n === 1 ? iw / 2 : (iw * i) / (n - 1));
   const y = (v) => pad.t + ih - (ih * (v || 0)) / maxY;
   const gridVals = [0, Math.round(maxY/2), maxY];
-
   const grid = gridVals.map(v => `
     <line x1="${pad.l}" y1="${y(v)}" x2="${W-pad.r}" y2="${y(v)}" stroke="var(--line)"/>
     <text x="${pad.l-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--ink-faint)">${v}</text>`).join("");
-
   const pts = series.map((d, i) => [x(i), y(d.units_booked)]);
   const line = pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" ");
   const dots = series.map((d, i) => `
-    <circle cx="${x(i)}" cy="${y(d.units_booked)}" r="3.5" fill="var(--accent)"/>
+    <circle cx="${x(i)}" cy="${y(d.units_booked)}" r="3.5" fill="var(--good)"/>
     <text x="${x(i)}" y="${y(d.units_booked)-8}" text-anchor="middle" font-size="10" fill="var(--ink)">${d.units_booked}</text>`).join("");
-
   const xlabels = series.map((d, i) =>
     (i === 0 || i === n - 1 || n <= 3)
       ? `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--ink-faint)">${fmtDate(d.snapshot_date)}</text>` : "").join("");
-
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="Flats booked over time">
-    ${grid}
-    ${n > 1 ? `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2"/>` : ""}
-    ${dots}${xlabels}
+    ${grid}${n > 1 ? `<path d="${line}" fill="none" stroke="var(--good)" stroke-width="2"/>` : ""}${dots}${xlabels}
   </svg>`;
 }
 
 /* ---------------- Project detail ---------------- */
 async function renderProject(reg) {
-  app.innerHTML = `<a class="back" href="#/">← All projects</a><div class="spinner">Loading…</div>`;
+  app.innerHTML = `<a class="back" href="#/explore">← All projects</a><div class="spinner">Loading…</div>`;
   let d, trend = [];
   try { d = await api("/api/projects/" + reg); }
-  catch (e) { app.innerHTML = `<a class="back" href="#/">← All projects</a><div class="empty">Project not found.</div>`; return; }
+  catch (e) { app.innerHTML = `<a class="back" href="#/explore">← All projects</a><div class="empty">Project not found.</div>`; return; }
   try { trend = await api("/api/trend?registration_no=" + encodeURIComponent(reg)); } catch (e) {}
 
   const p = d.project, pr = d.promoter, s = d.allottee_summary;
   const soldW = s.total ? (100*s.sold/s.total) : 0;
   const mortW = s.total ? (100*s.mortgage/s.total) : 0;
   const otherW = s.total ? (100*(s.total-s.sold-s.mortgage)/s.total) : 0;
-
   const checkItem = (i) => `<li>
       <span class="mark ${i.present?"yes":"no"}">${i.present?"✓":"·"}</span>
       <span>${esc(i.label)}</span>
       ${i.present && i.doc_url ? `<a class="doclink" href="${esc(i.doc_url)}" target="_blank" rel="noopener">view</a>` : ""}
     </li>`;
-
   const amenities = (d.common_areas && d.common_areas.amenities_json) || [];
   const apt = d.apartment_types || [];
 
   app.innerHTML = `
-    <a class="back" href="#/">← All projects</a>
+    <a class="back" href="#/explore">← All projects</a>
     <h1>${esc(p.project_name) || "Untitled project"}</h1>
     <div class="badges" style="margin-bottom:14px">
-      ${p.district ? `<span class="badge">${esc(p.district)}</span>` : ""}
+      ${p.district ? `<span class="badge lav">${esc(p.district)}</span>` : ""}
       ${p.project_type ? `<span class="badge gray">${esc(p.project_type)}</span>` : ""}
       ${p.project_category ? `<span class="badge gray">${esc(p.project_category)}</span>` : ""}
       ${p.status ? `<span class="badge ${statusClass(p.status)}">${esc(p.status)}</span>` : ""}
@@ -310,7 +388,7 @@ async function renderProject(reg) {
     </div>
 
     <div class="panel">
-      <h2 style="margin-top:0">Inventory${s.total ? ` — ${s.sold_pct}% sold` : ""}</h2>
+      <h2 style="margin-top:0">Inventory${s.total ? ` — ${s.sold_pct}% booked` : ""}</h2>
       ${s.total ? `
         <div class="bar">
           <div class="seg sold" style="width:${soldW}%"></div>
@@ -318,19 +396,17 @@ async function renderProject(reg) {
           <div class="seg other" style="width:${otherW}%"></div>
         </div>
         <div class="legend">
-          <span><span class="sw" style="background:var(--good)"></span>Sold ${num(s.sold)}</span>
+          <span><span class="sw" style="background:var(--good)"></span>Booked ${num(s.sold)}</span>
           <span><span class="sw" style="background:var(--warn)"></span>Mortgage ${num(s.mortgage)}</span>
-          <span><span class="sw" style="background:#cbd2d9"></span>Unsold/other ${num(s.total-s.sold-s.mortgage)}</span>
+          <span><span class="sw" style="background:#c9d2cb"></span>Unsold/other ${num(s.total-s.sold-s.mortgage)}</span>
           <span class="faint">Total units ${num(s.total)}</span>
         </div>` : `<p class="faint" style="margin:0">No unit-level inventory recorded for this project.</p>`}
       ${apt.length ? `
         <h2>Apartment types</h2>
-        <table><thead><tr><th>Type</th><th class="num">Carpet (m²)</th><th class="num">Total</th><th class="num">Sold</th><th class="num">Unsold</th></tr></thead>
+        <table><thead><tr><th>Type</th><th class="num">Carpet (m²)</th><th class="num">Total</th><th class="num">Booked</th><th class="num">Unsold</th></tr></thead>
         <tbody>${apt.map(a => `<tr>
-          <td>${esc(a.type_name)}</td>
-          <td class="num">${a.carpet_area_sqft ?? "—"}</td>
-          <td class="num">${num(a.total_count)}</td>
-          <td class="num">${num(a.sold_count)}</td>
+          <td>${esc(a.type_name)}</td><td class="num">${a.carpet_area_sqft ?? "—"}</td>
+          <td class="num">${num(a.total_count)}</td><td class="num">${num(a.sold_count)}</td>
           <td class="num">${num(a.unsold_count)}</td></tr>`).join("")}</tbody></table>` : ""}
     </div>
 
@@ -348,11 +424,11 @@ async function renderProject(reg) {
       <h2 style="margin-top:0">Document checklist</h2>
       <div class="facts">
         <div>
-          <div class="l faint" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Must-have</div>
+          <div class="l faint" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:8px">Must-have</div>
           <ul class="checklist">${d.document_checklist.must_have.map(checkItem).join("")}</ul>
         </div>
         <div>
-          <div class="l faint" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Good-to-have</div>
+          <div class="l faint" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:8px">Good-to-have</div>
           <ul class="checklist">${d.document_checklist.good_to_have.map(checkItem).join("")}</ul>
         </div>
       </div>
@@ -372,33 +448,24 @@ async function renderProject(reg) {
 
 /* ---------------- Builder ---------------- */
 async function renderBuilder(name) {
-  app.innerHTML = `<a class="back" href="#/">← All projects</a><div class="spinner">Loading…</div>`;
+  app.innerHTML = `<a class="back" href="#/explore">← All projects</a><div class="spinner">Loading…</div>`;
   let b;
   try { b = await api("/api/builders/" + encodeURIComponent(name)); }
-  catch (e) { app.innerHTML = `<a class="back" href="#/">← All projects</a><div class="empty">Builder not found.</div>`; return; }
+  catch (e) { app.innerHTML = `<a class="back" href="#/explore">← All projects</a><div class="empty">Builder not found.</div>`; return; }
 
   const declared = b.declared_history || [];
-  const declaredTotal = declared.length;
-  const histStatusClass = (s) => {
-    const t = (s||"").toLowerCase();
-    if (t === "ongoing") return "good";
-    if (t === "past") return "gray";
-    return "warn";
-  };
+  const histStatusClass = (s) => { const t=(s||"").toLowerCase(); return t==="ongoing"?"good":t==="past"?"gray":"warn"; };
   const histRow = (h) => `<tr>
-    <td>${h.in_db
-          ? `<a href="#/project/${esc(h.registration_no)}">${esc(h.project_name)}</a>`
-          : esc(h.project_name)}</td>
+    <td>${h.in_db ? `<a href="#/project/${esc(h.registration_no)}">${esc(h.project_name)}</a>` : esc(h.project_name)}</td>
     <td class="reg">${esc(h.registration_no)||"—"}</td>
     <td><span class="badge ${histStatusClass(h.status)}">${esc(h.status)}</span></td>
     <td>${h.in_db ? `<span class="badge good">in Homelytics</span>` : `<span class="faint" style="font-size:12px">not yet scraped</span>`}</td>
   </tr>`;
 
   app.innerHTML = `
-    <a class="back" href="#/">← All projects</a>
+    <a class="back" href="#/explore">← All projects</a>
     <h1>${esc(b.name)}</h1>
     ${b.company_type ? `<div class="badges" style="margin-bottom:14px"><span class="badge gray">${esc(b.company_type)}</span></div>` : ""}
-
     <div class="stats">
       <div class="stat"><div class="n">${num(b.project_count)}</div><div class="l">In Homelytics</div></div>
       <div class="stat"><div class="n">${num(b.ongoing_count)}</div><div class="l">Declared ongoing</div></div>
@@ -415,26 +482,23 @@ async function renderBuilder(name) {
       <div class="card click" onclick="location.hash='#/project/${esc(p.registration_no)}'">
         <div><div class="title">${esc(p.project_name)||"Untitled"}</div><div class="reg">${esc(p.registration_no)}</div></div>
         <div class="badges">
-          ${p.district?`<span class="badge">${esc(p.district)}</span>`:""}
+          ${p.district?`<span class="badge lav">${esc(p.district)}</span>`:""}
           ${p.project_type?`<span class="badge gray">${esc(p.project_type)}</span>`:""}
           ${p.status?`<span class="badge ${statusClass(p.status)}">${esc(p.status)}</span>`:""}
         </div>
         <div class="kv"><span>Registered</span><b>${fmtDate(p.date_of_registration)}</b></div>
       </div>`).join("")}</div>` : `<p class="faint">None scraped yet.</p>`}
 
-    ${declaredTotal ? `
-    <h2>Declared project history <span class="faint" style="font-weight:400">(${declaredTotal})</span></h2>
+    ${declared.length ? `
+    <h2>Declared project history <span class="faint" style="font-weight:400">(${declared.length})</span></h2>
     <p class="faint" style="margin:-6px 0 10px;font-size:13px">Self-reported by the builder on RERA — not all are in our database.</p>
     <div class="panel" style="padding:0;overflow:auto">
-      <table>
-        <thead><tr><th>Project</th><th>Registration No</th><th>Status</th><th>Coverage</th></tr></thead>
-        <tbody>${declared.map(histRow).join("")}</tbody>
-      </table>
+      <table><thead><tr><th>Project</th><th>Registration No</th><th>Status</th><th>Coverage</th></tr></thead>
+      <tbody>${declared.map(histRow).join("")}</tbody></table>
     </div>` : ""}
 
     <div id="comp"></div>
   `;
-  // complaints detail (best-effort)
   try {
     const cs = await api("/api/complaints?respondent=" + encodeURIComponent(name));
     const box = document.getElementById("comp");
@@ -444,7 +508,7 @@ async function renderBuilder(name) {
         <table><thead><tr><th>Complainant</th><th>Type</th><th>Status</th><th>Filed</th></tr></thead>
         <tbody>${cs.map(c => `<tr><td>${esc(c.complainant)}</td><td>${esc(c.complaint_type)}</td><td>${esc(c.status)}</td><td>${fmtDate(c.filed_date)}</td></tr>`).join("")}</tbody></table></div>`;
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 /* ---------------- Router ---------------- */
@@ -452,7 +516,8 @@ function route() {
   const h = location.hash || "#/";
   if (h.startsWith("#/project/")) return renderProject(h.slice("#/project/".length));
   if (h.startsWith("#/builder/")) return renderBuilder(decodeURIComponent(h.slice("#/builder/".length)));
-  return renderHome();
+  if (h.startsWith("#/explore")) return renderExplore();
+  return renderLanding();
 }
 window.addEventListener("hashchange", () => { window.scrollTo(0,0); route(); });
 route();

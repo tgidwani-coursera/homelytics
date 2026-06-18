@@ -212,10 +212,11 @@ pip install -r requirements.txt   # adds fastapi + uvicorn
 ./run.sh                          # -> http://127.0.0.1:8000  (reads .env)
 ```
 
-Pages (hash-routed): home (stats + search/filters + project cards), project
-detail (inventory sold% bar, apartment types, a must-have/good-to-have document
-checklist, amenities), and builder profiles (project list, past/ongoing counts,
-complaints). API under `/api/*`:
+Pages (hash-routed): a welcoming landing (`#/`) with a state/district picker that
+leads into the explorer (`#/explore` — stats + search/filters + project cards),
+project detail (inventory booked% bar, flats-booked-over-time trend, apartment
+types, a must-have/good-to-have document checklist, amenities), and builder
+profiles (in-DB projects + declared history, complaints). API under `/api/*`:
 
 | Endpoint | Returns |
 |----------|---------|
