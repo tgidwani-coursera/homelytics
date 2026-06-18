@@ -244,6 +244,18 @@ def builder_profile(promoter_name: str) -> dict[str, Any]:
     """, (promoter_name,))
     by = {c["status"]: c["n"] for c in counts}
 
+    # The builder's self-declared project history (independent of what we scraped).
+    # Flag each with whether we have it in our own projects table (so it can link).
+    declared_history = fetch_all("""
+        SELECT DISTINCT h.project_name, h.registration_no, h.status,
+               (pr.registration_no IS NOT NULL) AS in_db
+        FROM promoter_projects_history h
+        JOIN promoters p USING (promoter_id)
+        LEFT JOIN projects pr ON pr.registration_no = h.registration_no
+        WHERE p.name = %s
+        ORDER BY h.status, h.project_name
+    """, (promoter_name,))
+
     complaints = fetch_one("""
         SELECT count(*) AS n FROM complaints
         WHERE lower(respondent) = lower(%s)
@@ -258,6 +270,7 @@ def builder_profile(promoter_name: str) -> dict[str, Any]:
             (promoter_name,)) or {}).get("company_type"),
         "projects": proj,
         "project_count": len(proj),
+        "declared_history": declared_history,
         "past_count": by.get("past", 0),
         "ongoing_count": by.get("ongoing", 0),
         "registered_count": by.get("registered", 0),

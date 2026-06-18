@@ -4,16 +4,18 @@ Deferred fixes identified during the 52-project sample audit (2026-06). These do
 not block dashboard work on the current sample, but **must** be applied before a
 full-scale scrape so the complete dataset is clean.
 
-## 1. Status bug — keep the list-level workflow status
+## 1. Status bug — keep the list-level workflow status  ✅ RESOLVED (2026-06)
 
-`scrapers/project_detail.py::_enrich_project` overwrites `projects.status` with
-`GetProjectById.StatusOfProject`, which returns "Rejected" for ~all registered
-projects (it is not the registration/workflow status). Result: 51/52 sample
-projects wrongly show `status = "Rejected"`.
+`scrapers/project_detail.py::_enrich_project` used to overwrite `projects.status`
+with `GetProjectById.StatusOfProject`, which returns "Rejected" for ~all
+registered projects (it is not the registration/workflow status). Result: 51/52
+sample projects wrongly showed `status = "Rejected"`.
 
-**Fix:** stop overwriting `status` in the enrich step — keep the list-level
-status set by `project_list` (from `GetProjects.AppStatus`). `StatusOfProject`
-remains available in `project_details.raw_json` if ever needed.
+**Fixed:** removed the `status` overwrite in `_enrich_project` — `projects.status`
+now keeps the list-level value from `GetProjects.AppStatus` (e.g. "Application
+Approved" / "Objected"). `StatusOfProject` remains in `project_details.raw_json`.
+The 52-project sample was backfilled from `AppStatus`. No further action needed
+at full-scrape time.
 
 ## 2. Plot data — capture PlotArea / PlotType for plotted projects
 

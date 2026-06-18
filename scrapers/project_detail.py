@@ -47,7 +47,10 @@ def _enrich_project(project: dict[str, Any], registration_no: str) -> None:
     updates = {
         "project_category": clean(project.get("ProjectCategory")),
         "address": clean(project.get("ProjectLocation")),
-        "status": clean(project.get("StatusOfProject")),
+        # NOTE: do NOT set status from GetProjectById.StatusOfProject — it returns
+        # "Rejected" for ~all registered projects. The meaningful workflow status
+        # (e.g. "Application Approved" / "Objected") comes from GetProjects.AppStatus,
+        # set by project_list and intentionally left untouched here. (SCRAPING_FIXES #1)
         # "DateofRegistration" ("28-04-2026") is cleaner than the list's APPROVEDON.
         "date_of_registration": to_date(clean(project.get("DateofRegistration"))),
     }

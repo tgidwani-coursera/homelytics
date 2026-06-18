@@ -372,18 +372,41 @@ async function renderBuilder(name) {
   try { b = await api("/api/builders/" + encodeURIComponent(name)); }
   catch (e) { app.innerHTML = `<a class="back" href="#/">← All projects</a><div class="empty">Builder not found.</div>`; return; }
 
+  const declared = b.declared_history || [];
+  const declaredTotal = declared.length;
+  const histStatusClass = (s) => {
+    const t = (s||"").toLowerCase();
+    if (t === "ongoing") return "good";
+    if (t === "past") return "gray";
+    return "warn";
+  };
+  const histRow = (h) => `<tr>
+    <td>${h.in_db
+          ? `<a href="#/project/${esc(h.registration_no)}">${esc(h.project_name)}</a>`
+          : esc(h.project_name)}</td>
+    <td class="reg">${esc(h.registration_no)||"—"}</td>
+    <td><span class="badge ${histStatusClass(h.status)}">${esc(h.status)}</span></td>
+    <td>${h.in_db ? `<span class="badge good">in Homelytics</span>` : `<span class="faint" style="font-size:12px">not yet scraped</span>`}</td>
+  </tr>`;
+
   app.innerHTML = `
     <a class="back" href="#/">← All projects</a>
     <h1>${esc(b.name)}</h1>
     ${b.company_type ? `<div class="badges" style="margin-bottom:14px"><span class="badge gray">${esc(b.company_type)}</span></div>` : ""}
+
     <div class="stats">
-      <div class="stat"><div class="n">${num(b.project_count)}</div><div class="l">Registered (here)</div></div>
-      <div class="stat"><div class="n">${num(b.ongoing_count)}</div><div class="l">Ongoing (declared)</div></div>
-      <div class="stat"><div class="n">${num(b.past_count)}</div><div class="l">Past (declared)</div></div>
+      <div class="stat"><div class="n">${num(b.project_count)}</div><div class="l">In Homelytics</div></div>
+      <div class="stat"><div class="n">${num(b.ongoing_count)}</div><div class="l">Declared ongoing</div></div>
+      <div class="stat"><div class="n">${num(b.past_count)}</div><div class="l">Declared completed</div></div>
       <div class="stat"><div class="n">${num(b.total_complaints)}</div><div class="l">Complaints</div></div>
     </div>
-    <h2>Projects</h2>
-    <div class="grid">${b.projects.map(p => `
+    <p class="faint" style="margin:-6px 0 8px;font-size:13px">
+      <b>In Homelytics</b> = projects we've scraped in detail (below). <b>Declared</b> counts come from
+      the builder's own RERA project history — their full track record, only some of which we've scraped.
+    </p>
+
+    <h2>Projects in Homelytics <span class="faint" style="font-weight:400">(${b.projects.length})</span></h2>
+    ${b.projects.length ? `<div class="grid">${b.projects.map(p => `
       <div class="card click" onclick="location.hash='#/project/${esc(p.registration_no)}'">
         <div><div class="title">${esc(p.project_name)||"Untitled"}</div><div class="reg">${esc(p.registration_no)}</div></div>
         <div class="badges">
@@ -392,7 +415,18 @@ async function renderBuilder(name) {
           ${p.status?`<span class="badge ${statusClass(p.status)}">${esc(p.status)}</span>`:""}
         </div>
         <div class="kv"><span>Registered</span><b>${fmtDate(p.date_of_registration)}</b></div>
-      </div>`).join("")}</div>
+      </div>`).join("")}</div>` : `<p class="faint">None scraped yet.</p>`}
+
+    ${declaredTotal ? `
+    <h2>Declared project history <span class="faint" style="font-weight:400">(${declaredTotal})</span></h2>
+    <p class="faint" style="margin:-6px 0 10px;font-size:13px">Self-reported by the builder on RERA — not all are in our database.</p>
+    <div class="panel" style="padding:0;overflow:auto">
+      <table>
+        <thead><tr><th>Project</th><th>Registration No</th><th>Status</th><th>Coverage</th></tr></thead>
+        <tbody>${declared.map(histRow).join("")}</tbody>
+      </table>
+    </div>` : ""}
+
     <div id="comp"></div>
   `;
   // complaints detail (best-effort)
