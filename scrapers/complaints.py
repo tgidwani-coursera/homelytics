@@ -65,18 +65,19 @@ def scrape_complaints(
     )
 
     batch: list[dict[str, Any]] = []
-    seen: set[tuple] = set()
+    seen: set[str] = set()
     for item in complaints:
         complainant = clean(item.get("CitizenName"))
         respondent = clean(item.get("RespondentName"))
-        filed = to_date(str(item.get("createdon"))) if item.get("createdon") else None
-        if not (complainant or respondent):
+        complaint_no = clean(item.get("ComplaintNumber")) or clean(item.get("complaintno"))
+        # createdon is null for ~all rows; updatedon is the only reliable date.
+        filed = to_date(str(item.get("updatedon"))) if item.get("updatedon") else None
+        if not complaint_no or not (complainant or respondent):
             continue
 
-        key = (complainant, respondent, filed)
-        if key in seen:  # satisfy the (complainant, respondent, filed_date) unique key
+        if complaint_no in seen:  # stable per-complaint key
             continue
-        seen.add(key)
+        seen.add(complaint_no)
 
         reg_no = _match(respondent, promoter_index) or _match(
             clean(item.get("ProjectName")), project_index
@@ -84,10 +85,11 @@ def scrape_complaints(
 
         batch.append(
             {
+                "complaint_no": complaint_no,
                 "registration_no": reg_no,
                 "complainant": complainant,
                 "respondent": respondent,
-                "complaint_type": str(item.get("complaintTypeID") or ""),
+                "complaint_type": str(item.get("complaintTypeID") or "") or None,
                 "status": str(item.get("StatusId") or "") or None,
                 "filed_date": filed,
                 "state": "rajasthan",
@@ -95,10 +97,7 @@ def scrape_complaints(
         )
 
     if batch:
-        upsert_many(
-            "complaints", batch,
-            conflict_cols=["complainant", "respondent", "filed_date"],
-        )
+        upsert_many("complaints", batch, conflict_cols=["complaint_no"])
     linked = sum(1 for b in batch if b["registration_no"])
     logger.info("Stored %d complaints (%d linked to a project)", len(batch), linked)
     return len(batch)

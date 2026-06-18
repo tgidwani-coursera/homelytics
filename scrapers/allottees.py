@@ -1,11 +1,17 @@
 """Unit-level allottee / booking data from the legacy ViewProjectWebsite record.
 
-Source: ``GetApartmentAllotteeDetailsList`` — one entry per physical unit, with
-its block, carpet area and Sold/Unsold status.
+Source: ``GetApartmentAllotteeDetailsList`` — one entry per physical unit.
+- Apartments carry ``CarpetArea`` + ``Block``.
+- Plots carry ``PlotArea`` + ``PlotType`` (and no carpet area / block).
+
+Refresh is idempotent via delete-then-insert per project: plots have a NULL
+block, so the (registration_no, floor_no, unit_no) unique key can't dedupe them
+on its own (NULLs never conflict) — clearing the project's rows first avoids
+duplicates on re-scrape.
 
 Privacy note: the source rows include allottee names (PII). The `allottees`
 schema intentionally has no name column, so we store only the unit, block,
-carpet area and booking status — not who booked it.
+carpet/plot area and booking status — not who booked it.
 """
 
 from __future__ import annotations
@@ -13,7 +19,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from db.connection import upsert_many
+from db.connection import get_cursor, upsert_many
 from .utils import clean, to_date, to_float
 
 logger = logging.getLogger("homelytics.allottees")
@@ -27,8 +33,6 @@ def _status(raw: Optional[str]) -> Optional[str]:
         return "sold"
     if low in ("unsold", "available", "unbooked"):
         return "unsold"
-    # Other statuses (mortgage, not-yet-approved, ...) kept but case-normalised
-    # so trivial casing variants don't split into separate values.
     return low
 
 
@@ -53,16 +57,25 @@ def scrape_allottees(vp: dict[str, Any], registration_no: str) -> int:
                 "floor_no": block,
                 "unit_no": unit_no,
                 "carpet_area": to_float(unit.get("CarpetArea")),
+                "plot_area": to_float(unit.get("PlotArea")),
+                "plot_type": clean(unit.get("PlotType")),
                 "booking_status": _status(unit.get("BookingStatus")),
                 "booking_date": to_date(clean(unit.get("DateAFS"))),
             }
         )
 
+    # Idempotent refresh: clear this project's units, then insert the fresh set.
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM allottees WHERE registration_no = %s", (registration_no,))
     if rows:
         upsert_many(
             "allottees", rows,
             conflict_cols=["registration_no", "floor_no", "unit_no"],
         )
     sold = sum(1 for r in rows if r["booking_status"] == "sold")
-    logger.info("%s: %d allottee units (%d sold)", registration_no, len(rows), sold)
+    plots = sum(1 for r in rows if r["plot_area"] is not None)
+    logger.info(
+        "%s: %d allottee units (%d sold, %d plots)",
+        registration_no, len(rows), sold, plots,
+    )
     return len(rows)

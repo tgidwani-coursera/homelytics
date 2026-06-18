@@ -17,45 +17,42 @@ Approved" / "Objected"). `StatusOfProject` remains in `project_details.raw_json`
 The 52-project sample was backfilled from `AppStatus`. No further action needed
 at full-scrape time.
 
-## 2. Plot data — capture PlotArea / PlotType for plotted projects
+## 2. Plot data — capture PlotArea / PlotType  ✅ RESOLVED (2026-06)
 
-Plotted projects (~67% of the sample) have units in
-`GetApartmentAllotteeDetailsList` with `PlotArea` / `PlotType` / `PlotId` set but
-`CarpetArea` / `Block` null. We currently store only `Units` + `BookingStatus`,
-so ~72% of allottee rows have NULL `carpet_area` and no size data.
+Plotted projects (~67% of the sample) have units with `PlotArea` / `PlotType`
+set but `CarpetArea` / `Block` null, so plotted units had no size data.
 
-**Fix:** in `scrapers/allottees.py`, for plot entries fall back to `PlotArea`
-(into `carpet_area`, or add a dedicated column) and record `PlotType`. Decide
-whether to add `plot_area` / `plot_type` columns to the `allottees` schema vs.
-reusing `carpet_area`.
+**Fixed:** added `plot_area` / `plot_type` columns to `allottees`;
+`scrapers/allottees.py` now captures both. `allottees` refresh is also now
+delete-then-insert per project (plots have NULL block, so the unique key alone
+couldn't dedupe them on re-scrape). Backfilled: all 5,045 plotted units now
+carry `plot_area`/`plot_type`. (Note: the portal's `PlotType` often just repeats
+the plot number rather than a category — that's the source data.)
 
-## 3. Complaints date & status/type labels
+## 3. Complaints date & stable key  ✅ RESOLVED (2026-06) — labels still open
 
-- `filed_date` is empty: source `createdon` is null for ~99.97% of complaints;
-  only `updatedon` is reliably populated. **Fix:** map `filed_date ← updatedon`
-  (best-available date; note it is "last updated", not strictly "filed").
-- `complaints.status` stores numeric codes (101 / 114 / 115 / 110) and
-  `complaint_type` stores 1 / 2, with no labels. **Fix:** fetch the status-code →
-  label master (and complaint-type master) from the portal and store readable
-  labels (or a lookup table).
-- Consider a more stable unique key for `complaints` (e.g. ComplaintNumber)
-  since `filed_date` currently underpins the upsert constraint.
+- **Fixed:** `filed_date ← updatedon` (source `createdon` is null for ~99.97% of
+  rows; `updatedon` is the only reliable date — it is "last updated", not strictly
+  "filed"). All complaints now carry a date.
+- **Fixed:** added `complaint_no` (portal's `ComplaintNumber`) and made it the
+  unique/dedup key, so re-scrapes are idempotent regardless of date changes.
+- **Still open (no public source):** `status` (numeric, e.g. 115/89/88) and
+  `complaint_type` (1/2) have no label. The complaint records carry no status-name
+  field, and no public master endpoint for complaint statuses was found (the
+  `GetComponentsNew` master is districts, not statuses). Left as codes rather than
+  fabricated labels — needs the portal's internal master or a manual mapping.
 
-## 4. Derive aggregate counts after scraping
+## 4. Derive aggregate counts after scraping  ✅ RESOLVED (2026-06)
 
-These columns have no API source but are derivable; populate them in a
-post-scrape pass:
-
-- `project_details.total_units`, `units_booked`, `units_unsold`
-  ← counts from `allottees` per `registration_no`
-  (`total = count(*)`, `booked = count where booking_status = 'sold'`,
-  `unsold = count where booking_status = 'unsold'`; note other statuses like
-  `mortgage` / `not yet approved for sale` exist).
-- `promoters.past_projects_count`, `promoters.ongoing_projects_count`
-  ← counts from `promoter_projects_history` per `promoter_id`
-  (by `status = 'past'` / `status = 'ongoing'`).
+**Fixed:** `scrapers/derive.py` (`derive_all`, run at the end of every scrape in
+`main.py`) populates:
+- `project_details.total_units / units_booked / units_unsold` from `allottees`
+  counts (booked = `sold`, unsold = `unsold`; note other statuses like `mortgage`
+  also exist, so booked + unsold may be < total).
+- `promoters.past_projects_count / ongoing_projects_count` from
+  `promoter_projects_history` per `promoter_id`.
 
 ---
 
-_Source: DB audit of the 52-project Jaipur sample. See README "Granular data
-(automatic)" for the scrape pipeline these fixes apply to._
+_Source: DB audit of the 52-project Jaipur sample. #1–#4 applied to the sample
+2026-06; the code fixes carry forward to the full scrape automatically._

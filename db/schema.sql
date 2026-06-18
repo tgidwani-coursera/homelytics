@@ -76,11 +76,17 @@ CREATE TABLE IF NOT EXISTS allottees (
     registration_no TEXT REFERENCES projects (registration_no) ON DELETE CASCADE,
     floor_no        TEXT,
     unit_no         TEXT,
-    carpet_area     NUMERIC(10,2),
-    booking_status  TEXT,  -- sold / unsold
+    carpet_area     NUMERIC(10,2),   -- apartment carpet area (m²); NULL for plots
+    plot_area       NUMERIC(12,2),   -- plot area (for plotted projects)
+    plot_type       TEXT,            -- plot type (for plotted projects)
+    booking_status  TEXT,  -- sold / unsold / mortgage / ...
     booking_date    DATE,
     UNIQUE (registration_no, floor_no, unit_no)
 );
+
+-- Backfill columns onto an existing allottees table (no-op if already present).
+ALTER TABLE allottees ADD COLUMN IF NOT EXISTS plot_area NUMERIC(12,2);
+ALTER TABLE allottees ADD COLUMN IF NOT EXISTS plot_type TEXT;
 
 CREATE TABLE IF NOT EXISTS common_areas (
     id              BIGSERIAL PRIMARY KEY,
@@ -104,15 +110,16 @@ CREATE TABLE IF NOT EXISTS documents (
 
 CREATE TABLE IF NOT EXISTS complaints (
     id              BIGSERIAL PRIMARY KEY,
+    complaint_no    TEXT,   -- portal's ComplaintNumber; stable idempotency key
     registration_no TEXT REFERENCES projects (registration_no) ON DELETE SET NULL,
     complainant     TEXT,
     respondent      TEXT,
-    complaint_type  TEXT,
-    status          TEXT,
-    filed_date      DATE,
+    complaint_type  TEXT,   -- numeric code (portal exposes no label master)
+    status          TEXT,   -- numeric code (portal exposes no label master)
+    filed_date      DATE,   -- best-available: portal's updatedon (createdon is ~always null)
     state           TEXT NOT NULL DEFAULT 'rajasthan',
     scraped_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (complainant, respondent, filed_date)
+    UNIQUE (complaint_no)
 );
 
 CREATE INDEX IF NOT EXISTS idx_complaints_respondent ON complaints (respondent);

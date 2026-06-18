@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 from db.connection import apply_schema, close_pool, init_pool
 from scrapers.api import api_client
 from scrapers.complaints import scrape_complaints
+from scrapers.derive import derive_all
 from scrapers.project_detail import scrape_detail
 from scrapers.project_list import scrape_list
 from scrapers.snapshots import record_snapshot
@@ -140,6 +141,10 @@ def run(args: argparse.Namespace) -> int:
         if do_complaints:
             logger.info("Scraping complaints register")
             complaints_done = scrape_complaints(client, limit=args.limit)
+
+    # Post-scrape: derive aggregate counts that have no direct API source.
+    if not args.skip_details:
+        derive_all()
 
     logger.info(
         "Done. projects=%d details_ok=%d complaints=%d",
