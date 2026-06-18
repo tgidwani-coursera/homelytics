@@ -127,7 +127,13 @@ def stats() -> dict[str, Any]:
         "SELECT DISTINCT project_type FROM projects WHERE project_type IS NOT NULL ORDER BY 1")]
     statuses = [r["status"] for r in fetch_all(
         "SELECT DISTINCT status FROM projects WHERE status IS NOT NULL ORDER BY 1")]
-    row["filters"] = {"districts": districts, "types": types, "statuses": statuses}
+    completion_years = [r["y"] for r in fetch_all(
+        "SELECT DISTINCT EXTRACT(YEAR FROM expected_completion_date)::int AS y "
+        "FROM project_details WHERE expected_completion_date IS NOT NULL ORDER BY y")]
+    row["filters"] = {
+        "districts": districts, "types": types,
+        "statuses": statuses, "completion_years": completion_years,
+    }
     return row
 
 
@@ -136,6 +142,7 @@ def projects(
     district: Optional[str] = None,
     type: Optional[str] = Query(None),
     status: Optional[str] = None,
+    completion_year: Optional[int] = None,
     search: Optional[str] = None,
 ) -> list[dict[str, Any]]:
     clauses, params = ["1=1"], []
@@ -145,6 +152,9 @@ def projects(
         clauses.append("p.project_type = %s"); params.append(type)
     if status:
         clauses.append("p.status = %s"); params.append(status)
+    if completion_year:
+        clauses.append("EXTRACT(YEAR FROM d.expected_completion_date)::int = %s")
+        params.append(completion_year)
     if search:
         clauses.append(
             "(p.project_name ILIKE %s OR p.promoter_name ILIKE %s OR p.registration_no ILIKE %s)")

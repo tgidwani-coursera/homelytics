@@ -159,14 +159,15 @@ const statusClass = (s) => {
 };
 
 /* ---------------- Home ---------------- */
-let HOME_FILTERS = { district:"", type:"", status:"", search:"" };
+let HOME_FILTERS = { district:"", type:"", status:"", completion_year:"", search:"" };
 
 async function renderHome() {
   app.innerHTML = `<div class="spinner">Loading…</div>`;
   const stats = await api("/api/stats");
   const f = stats.filters;
-  const opt = (arr, sel) => `<option value="">All</option>` +
-    arr.map(v => `<option value="${esc(v)}" ${v===sel?"selected":""}>${esc(v)}</option>`).join("");
+  // First option shows the filter name as a placeholder; selecting it clears the filter.
+  const opt = (arr, sel, label) => `<option value="">${esc(label)}</option>` +
+    arr.map(v => `<option value="${esc(v)}" ${String(v)===String(sel)?"selected":""}>${esc(v)}</option>`).join("");
 
   app.innerHTML = `
     <h1>Find a RERA-registered project</h1>
@@ -179,22 +180,25 @@ async function renderHome() {
     </div>
     <div class="controls">
       <input id="q" type="search" placeholder="Search project, builder or registration no…" value="${esc(HOME_FILTERS.search)}">
-      <select id="fd">${opt(f.districts, HOME_FILTERS.district)}</select>
-      <select id="ft">${opt(f.types, HOME_FILTERS.type)}</select>
-      <select id="fs">${opt(f.statuses, HOME_FILTERS.status)}</select>
+      <select id="fd">${opt(f.districts, HOME_FILTERS.district, "District")}</select>
+      <select id="ft">${opt(f.types, HOME_FILTERS.type, "Project Type")}</select>
+      <select id="fs">${opt(f.statuses, HOME_FILTERS.status, "Application Status")}</select>
+      <select id="fy">${opt(f.completion_years || [], HOME_FILTERS.completion_year, "Completion Year")}</select>
     </div>
     <div id="results"><div class="spinner">Loading…</div></div>
   `;
 
   const q = document.getElementById("q");
-  const fd = document.getElementById("fd"), ft = document.getElementById("ft"), fs = document.getElementById("fs");
+  const fd = document.getElementById("fd"), ft = document.getElementById("ft"),
+        fs = document.getElementById("fs"), fy = document.getElementById("fy");
   let timer;
   const apply = () => {
-    HOME_FILTERS = { search:q.value.trim(), district:fd.value, type:ft.value, status:fs.value };
+    HOME_FILTERS = { search:q.value.trim(), district:fd.value, type:ft.value,
+                     status:fs.value, completion_year:fy.value };
     loadProjects();
   };
   q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(apply, 250); });
-  [fd, ft, fs].forEach(el => el.addEventListener("change", apply));
+  [fd, ft, fs, fy].forEach(el => el.addEventListener("change", apply));
   loadProjects();
 }
 
@@ -205,6 +209,7 @@ async function loadProjects() {
   if (HOME_FILTERS.district) p.set("district", HOME_FILTERS.district);
   if (HOME_FILTERS.type) p.set("type", HOME_FILTERS.type);
   if (HOME_FILTERS.status) p.set("status", HOME_FILTERS.status);
+  if (HOME_FILTERS.completion_year) p.set("completion_year", HOME_FILTERS.completion_year);
   const rows = await api("/api/projects?" + p.toString());
   if (!rows.length) { box.innerHTML = `<div class="empty">No projects match your filters.</div>`; return; }
   box.innerHTML = `<p class="faint" style="margin:0 0 12px">${rows.length} project${rows.length>1?"s":""}</p>
