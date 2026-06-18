@@ -99,12 +99,13 @@
   .stat .n { font-size: 28px; font-weight: 800; letter-spacing: -.5px; }
   .stat .l { color: var(--ink-soft); font-size: 13px; margin-top: 2px; }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 20px; }
+  .controls { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 20px; }
   .controls input, .controls select { font: inherit; font-weight: 500; padding: 11px 13px;
-    border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); }
-  .controls input { flex: 1 1 240px; min-width: 180px; }
+    border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); width: 100%; }
   .controls select { font-weight: 600; }
+  .filter-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .controls input:focus, .controls select:focus { outline: 2px solid var(--lav); border-color: var(--green); }
+  @media (max-width: 760px) { .filter-row { grid-template-columns: repeat(2, 1fr); } }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
@@ -269,10 +270,12 @@ async function renderExplore() {
     </div>
     <div class="controls">
       <input id="q" type="search" placeholder="Search project, builder or registration no…" value="${esc(HOME_FILTERS.search)}">
-      <select id="fd">${opt(f.districts, HOME_FILTERS.district, "District")}</select>
-      <select id="ft">${opt(f.types, HOME_FILTERS.type, "Project Type")}</select>
-      <select id="fs">${opt(f.statuses, HOME_FILTERS.status, "Application Status")}</select>
-      <select id="fy">${opt(f.completion_years || [], HOME_FILTERS.completion_year, "Completion Year")}</select>
+      <div class="filter-row">
+        <select id="fd">${opt(f.districts, HOME_FILTERS.district, "District")}</select>
+        <select id="ft">${opt(f.types, HOME_FILTERS.type, "Project Type")}</select>
+        <select id="fs">${opt(f.statuses, HOME_FILTERS.status, "Application Status")}</select>
+        <select id="fy">${opt(f.completion_years || [], HOME_FILTERS.completion_year, "Completion Year")}</select>
+      </div>
     </div>
     <div id="results"><div class="spinner">Loading…</div></div>
   `;
