@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Homelytics bi-weekly scrape (macOS launchd user agent).
+  Runs scripts/biweekly_scrape.sh on the 1st and 15th of each month at 02:00.
+
+  Install:
+    cp scripts/com.homelytics.biweekly.plist ~/Library/LaunchAgents/
+    launchctl load -w ~/Library/LaunchAgents/com.homelytics.biweekly.plist
+  Uninstall:
+    launchctl unload -w ~/Library/LaunchAgents/com.homelytics.biweekly.plist
+    rm ~/Library/LaunchAgents/com.homelytics.biweekly.plist
+  Run once now (test):
+    launchctl start com.homelytics.biweekly
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.homelytics.biweekly</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/tgidwani/homelytics/scripts/biweekly_scrape.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict>
+      <key>Day</key><integer>1</integer>
+      <key>Hour</key><integer>2</integer>
+      <key>Minute</key><integer>0</integer>
+    </dict>
+    <dict>
+      <key>Day</key><integer>15</integer>
+      <key>Hour</key><integer>2</integer>
+      <key>Minute</key><integer>0</integer>
+    </dict>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/Users/tgidwani/homelytics/biweekly.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/tgidwani/homelytics/biweekly.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
